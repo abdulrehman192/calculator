@@ -22,13 +22,18 @@ class _CalculatorState extends State<Calculator> {
     });
   }
 
-  void backSpace()
+  void backSpace(String text)
   {
     if(expression != '0' || expression != '00')
       {
         setState(() {
-          expression = expression.substring(expression.length -1);
-          print(expression);
+          String newString = expression.substring(0, expression.length -1);
+          expression = newString;
+
+          if(expression.length == 0)
+            {
+              expression = '0';
+            }
         });
       }
   }
@@ -78,6 +83,15 @@ class _CalculatorState extends State<Calculator> {
 
   void calculate(String text)
   {
+    setState(() {
+      String lastChar = expression.substring(expression.length -1);
+      if(lastChar == '%' || lastChar == '/' || lastChar == '*' || lastChar == '-' || lastChar == '+')
+        {
+          String newString = expression.substring(0,expression.length -1);
+          expression = newString;
+        }
+    });
+
     var p = Parser();
     Expression ex = p.parse(expression);
     ContextModel cm = ContextModel();
@@ -110,7 +124,7 @@ class _CalculatorState extends State<Calculator> {
               children: <Widget>[
                 calcButton(buttonText: 'C', callBack: clear),
                 calcButton(buttonText: '%', callBack: numClick),
-                calcButton(callBack: backSpace),
+                calcButton(buttonText: '',callBack: backSpace),
                 calcButton(buttonText: '/', callBack: numClick),
               ],
             ),
@@ -162,7 +176,7 @@ class _CalculatorState extends State<Calculator> {
   Widget calcButton({String? buttonText, Function? callBack})
   {
     Widget buttonWidget = Icon(Icons.backspace_outlined, size: 25,);
-    if(buttonText != null)
+    if(buttonText != null && buttonText != '')
       {
         buttonWidget = Text('$buttonText', style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),);
       }
